@@ -1,8 +1,6 @@
 package repository
 
 import (
-	"context"
-
 	"gorm.io/gorm"
 	"net-grpc.com/internal/domain/entities"
 )
@@ -50,13 +48,12 @@ func (r Repository) GetByID(bookID int) (*entities.BookDetail, error) {
 	}, nil
 }
 
-func (r Repository) GetAllRandom(ctx context.Context) (*[]entities.Books, error) {
+func (r Repository) GetAllRandom() ([]entities.Books, error) {
 	var books = []entities.Books{}
 
-	tx := r.db.Find(&books)
+	tx := r.db.Limit(10).Offset(0).Find(&books)
 	if tx.Error != nil {
 		return nil, tx.Error
 	}
-
-	return &books, nil
+	return books, nil
 }

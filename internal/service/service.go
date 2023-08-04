@@ -23,20 +23,29 @@ func NewService(repo repository.Repository) *BookService {
 }
 
 func (srv *BookService) GetRandomBook(emp *emptypb.Empty, stream pb.PrivateBookService_GetRandomBookServer) error {
-	log.Printf("GetRandomBook")
 
-	for _, i := range []string{"0", "1", "2", "3"} {
-		log.Printf("Item %s", i)
+	books, err := srv.repo.GetAllRandom()
+	if err != nil {
+		return err
+	}
+
+	for idx, book := range books {
+		log.Printf("book index: %d", idx)
 		var bookDisplayed = &pb.GetDisplayBooksResponse{
-			RandomBook: nil,
-			LastBook:   nil,
+			RandomBook: &pb.Book{
+				Id:        strconv.Itoa(book.ID),
+				Title:     book.Title,
+				Authors:   []string{},
+				PrintType: "BOOK",
+				Language:  book.Language,
+			},
+			LastBook: nil,
 		}
-		time.Sleep(10 * time.Second)
+		time.Sleep(5 * time.Second)
 		if err := stream.Send(bookDisplayed); err != nil {
 			return err
 		}
 	}
-
 	return nil
 }
 
