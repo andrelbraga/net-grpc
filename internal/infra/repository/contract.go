@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"time"
+
 	"gorm.io/gorm"
 	"net-grpc.com/internal/domain/entities"
 )
@@ -51,9 +53,18 @@ func (r Repository) GetByID(bookID int) (*entities.BookDetail, error) {
 func (r Repository) GetAllRandom() ([]entities.Books, error) {
 	var books = []entities.Books{}
 
-	tx := r.db.Limit(10).Offset(0).Find(&books)
+	dt := time.Now()
+
+	tx := r.db.Limit(10).Offset(dt.Minute()).Find(&books)
 	if tx.Error != nil {
 		return nil, tx.Error
 	}
 	return books, nil
 }
+
+// func() int {
+// 	dt := time.Now()
+// 	dt.Minute()
+// 	rand.Intn(30)
+// 	return 1
+// }

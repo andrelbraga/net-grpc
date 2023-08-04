@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"google.golang.org/protobuf/types/known/emptypb"
+	"net-grpc.com/internal/domain/entities"
 	pb "net-grpc.com/internal/grpc/proto"
 	"net-grpc.com/internal/infra/repository"
 )
@@ -23,6 +24,9 @@ func NewService(repo repository.Repository) *BookService {
 }
 
 func (srv *BookService) GetRandomBook(emp *emptypb.Empty, stream pb.PrivateBookService_GetRandomBookServer) error {
+	var booksDiplayed []entities.Books
+	var currentBook = &pb.GetDisplayBooksResponse{}
+	var lastBook = &pb.Book{}
 
 	books, err := srv.repo.GetAllRandom()
 	if err != nil {
@@ -31,20 +35,34 @@ func (srv *BookService) GetRandomBook(emp *emptypb.Empty, stream pb.PrivateBookS
 
 	for idx, book := range books {
 		log.Printf("book index: %d", idx)
-		var bookDisplayed = &pb.GetDisplayBooksResponse{
+
+		if len(booksDiplayed) > 0 {
+			var last = booksDiplayed[len(booksDiplayed)-1]
+			lastBook = &pb.Book{
+				Id:        strconv.Itoa(last.ID),
+				Title:     last.Title,
+				Authors:   []string{},
+				PrintType: entities.PrintTypeBook,
+				Language:  last.Language,
+			}
+		}
+
+		currentBook = &pb.GetDisplayBooksResponse{
 			RandomBook: &pb.Book{
 				Id:        strconv.Itoa(book.ID),
 				Title:     book.Title,
 				Authors:   []string{},
-				PrintType: "BOOK",
+				PrintType: entities.PrintTypeBook,
 				Language:  book.Language,
 			},
-			LastBook: nil,
+			LastBook: lastBook,
 		}
 		time.Sleep(5 * time.Second)
-		if err := stream.Send(bookDisplayed); err != nil {
+		if err := stream.Send(currentBook); err != nil {
 			return err
 		}
+		booksDiplayed = append(booksDiplayed, book)
+
 	}
 	return nil
 }
