@@ -1,0 +1,52 @@
+version: '3.3'
+
+services:
+  pgsql:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: dbmaster
+      POSTGRES_DB: postgres
+    volumes:
+      - /var/create_database.sql:/docker-entrypoint-initdb.d
+    ports:
+      - 5432:5432
+    networks:
+      - network-grpc
+
+  pgadmin:
+    container_name: pgadmin4-container
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: 'admin@admin.com'
+      PGADMIN_DEFAULT_PASSWORD: 'admin'
+    ports:
+      - 8080:80
+    depends_on:
+      - pgsql
+    networks:
+      - network-grpc
+
+  # app-dev:
+  #   container_name: figaroo-dev-container
+  #   image: docker.io/andrelbraga/figaroo-dev
+  #   environment:
+  #     NODE_ENV: development
+  #   build:
+  #     context: .
+  #     dockerfile: ./Dockerfile
+  #   ports:
+  #     - 3000:3000
+  #   networks:
+  #     - network-grpc
+  #   volumes:
+  #     - .:/usr/src/app
+  #     - /usr/src/app/node_modules
+  #   restart: unless-stopped
+  #   depends_on:
+  #     - pgsql
+
+networks:
+  network-grpc:
+    driver: bridge

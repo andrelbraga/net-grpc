@@ -1,0 +1,72 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+option go_package = "/grpc_services/private_service";
+package privateService;
+
+// PrivateBookService represents the PrivateBookService
+service PrivateBookService {
+  rpc GetRandomBook(google.protobuf.Empty) returns (stream GetDisplayBooksResponse);
+  rpc GetBookDetail(GetBookDetailsRequest) returns (GetBookDetailsResponse);
+}
+
+// GetDisplayBooks - Returns one random book and the latest book displayed
+// if it's the first call of the day, the last_book will be empty
+message GetDisplayBooksResponse {
+  Book random_book = 1 [json_name = "random_book"];
+  optional Book last_book = 2 [json_name = "last_book"];
+}
+
+// GetBookDetailsRequest represents the get book details request
+message GetBookDetailsRequest {
+  string book_id = 1 [json_name = "book_id"];
+}
+
+// GetBookDetailsRequest represents the get book details request
+message GetBookDetailsResponse {
+  string book_id = 1 [json_name = "book_id"];
+  Book book = 2 [json_name = "book"];
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Objects
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Book
+// Json Example:
+//
+//{
+//  id: "asdfasdfasdf"
+//  "title": "Tractor Mechanics",
+//  "authors": [
+//    "Roger Welsch"
+//  ],
+//  "subtitle": "A Catalog Performance Objectives, Criterion-referenced Measures, and Performance Guides for Tractor Mechanics",
+//  "publishedDate": "1976",
+//  "pageCount": 240,
+//  "printType": "BOOK",
+//  "imageLinks": {
+//    "smallThumbnail": "http://books.google.com/books/content?id=ohlJn7ehfvMC&printsec=frontcover&img=1&zoom=5&source=gbs_api",
+//    "thumbnail": "http://books.google.com/books/content?id=ohlJn7ehfvMC&printsec=frontcover&img=1&zoom=10&source=gbs_api"
+//  },
+//  "language": "en"
+//}
+//
+message Book {
+  string id = 1 [json_name = "id"];
+  string title = 2 [json_name = "title"];
+  repeated string authors = 3 [json_name = "authors"]; // Can be empty string array
+  BookImageLinks image_links = 7  [json_name = "image_links"];
+  string print_type = 6  [json_name = "print_type"];
+  string language = 8  [json_name = "language"];
+
+  optional int32 published_date = 4  [json_name = "published_date"];
+  optional int32 page_count = 5  [json_name = "page_count"];
+  optional string description = 9  [json_name = "description"];
+}
+
+message BookImageLinks {
+  string small_thumbnail = 1  [json_name = "small_thumbnail"];
+  string thumbnail = 2  [json_name = "thumbnail"];
+}
