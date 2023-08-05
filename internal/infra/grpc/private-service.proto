@@ -1,12 +1,11 @@
 syntax = "proto3";
 
-import "google/protobuf/empty.proto";
 option go_package = "/grpc_services/private_service";
 package privateService;
 
 // PrivateBookService represents the PrivateBookService
 service PrivateBookService {
-  rpc GetRandomBook(google.protobuf.Empty) returns (stream GetDisplayBooksResponse);
+  rpc GetRandomBook(GetBookRandomRequest) returns (stream GetDisplayBooksResponse);
   rpc GetBookDetail(GetBookDetailsRequest) returns (GetBookDetailsResponse);
 }
 
@@ -17,9 +16,15 @@ message GetDisplayBooksResponse {
   optional Book last_book = 2 [json_name = "last_book"];
 }
 
+// GetBookRandomRequest represents the get book details request
+message GetBookRandomRequest {
+  string api_key = 1 [json_name = "api_key"];
+}
+
 // GetBookDetailsRequest represents the get book details request
 message GetBookDetailsRequest {
-  string book_id = 1 [json_name = "book_id"];
+  string api_key = 1 [json_name = "api_key"];
+  string book_id = 2 [json_name = "book_id"];
 }
 
 // GetBookDetailsRequest represents the get book details request

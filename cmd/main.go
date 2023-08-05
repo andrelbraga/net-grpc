@@ -6,7 +6,7 @@ import (
 	"net"
 
 	"google.golang.org/grpc"
-	pb "net-grpc.com/internal/grpc/proto"
+	pb "net-grpc.com/internal/infra/grpc"
 	"net-grpc.com/internal/infra/repository"
 	"net-grpc.com/internal/service"
 )
@@ -22,8 +22,8 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	var repo = repository.NewRepository(con)
-	var bsrv = service.NewService(repo)
+	var repo = repository.NewBookRepository(con)
+	var bsrv = service.NewBookService(repo)
 
 	pb.RegisterPrivateBookServiceServer(s, bsrv)
 	log.Printf("server listening at %v", lis.Addr())

@@ -3,9 +3,11 @@ package entities
 import "time"
 
 const (
+	// PrintTypeBook
 	PrintTypeBook string = "BOOK"
 )
 
+// Books
 type Books struct {
 	ID            int     `json:"id"`
 	Title         string  `json:"title"`
@@ -16,6 +18,7 @@ type Books struct {
 	Description   *string `json:"description"`
 }
 
+// BookAuthor
 type BookAuthor struct {
 	ID        int        `json:"id"`
 	Author    string     `json:"author"`
@@ -23,6 +26,7 @@ type BookAuthor struct {
 	CreatedAt *time.Time `json:"created_at"`
 }
 
+// BookImageLinks
 type BookImageLinks struct {
 	ID             int        `json:"id"`
 	BookID         int        `json:"book_int_id"`

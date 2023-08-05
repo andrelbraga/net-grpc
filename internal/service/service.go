@@ -3,38 +3,45 @@ package service
 import (
 	"context"
 	"log"
+	"math/rand"
 	"strconv"
 	"time"
 
-	"google.golang.org/protobuf/types/known/emptypb"
 	"net-grpc.com/internal/domain/entities"
-	pb "net-grpc.com/internal/grpc/proto"
+	pb "net-grpc.com/internal/infra/grpc"
 	"net-grpc.com/internal/infra/repository"
 )
 
+// BookService
 type BookService struct {
 	pb.UnimplementedPrivateBookServiceServer
-	repo repository.Repository
+	repo *repository.BookRepository
 }
 
-func NewService(repo repository.Repository) *BookService {
+// NewBookService
+func NewBookService(repo *repository.BookRepository) *BookService {
 	return &BookService{
 		repo: repo,
 	}
 }
 
-func (srv *BookService) GetRandomBook(emp *emptypb.Empty, stream pb.PrivateBookService_GetRandomBookServer) error {
+// GetRandomBook
+func (srv *BookService) GetRandomBook(req *pb.GetBookRandomRequest, stream pb.PrivateBookService_GetRandomBookServer) error {
 	var booksDiplayed []entities.Books
 	var currentBook = &pb.GetDisplayBooksResponse{}
 	var lastBook = &pb.Book{}
+	var itemsPerRequest = 10
+	var totalItems = 40 //Por eu ja ter o numero de itens no banco resolvi deixar setado aqui mas poderia incluir um 'select count(*)'
 
-	books, err := srv.repo.GetAllRandom()
+	randomIds := getRandomBooks(itemsPerRequest, totalItems)
+	log.Printf("random ids: %d", randomIds)
+	books, err := srv.repo.GetBooksByIDs(randomIds)
 	if err != nil {
 		return err
 	}
 
 	for idx, book := range books {
-		log.Printf("book index: %d", idx)
+		log.Printf("index: %d bookId: %d", idx, book.ID)
 
 		if len(booksDiplayed) > 0 {
 			var last = booksDiplayed[len(booksDiplayed)-1]
@@ -67,6 +74,7 @@ func (srv *BookService) GetRandomBook(emp *emptypb.Empty, stream pb.PrivateBookS
 	return nil
 }
 
+// GetBookDetail
 func (srv *BookService) GetBookDetail(ctx context.Context, req *pb.GetBookDetailsRequest) (*pb.GetBookDetailsResponse, error) {
 	var listAuthors []string
 
@@ -76,7 +84,7 @@ func (srv *BookService) GetBookDetail(ctx context.Context, req *pb.GetBookDetail
 	}
 
 	log.Printf("searching book-detail by id %d", bookId)
-	result, err := srv.repo.GetByID(bookId)
+	result, err := srv.repo.GetBookDetailByID(bookId)
 	if err != nil {
 		return nil, err
 	}
@@ -101,4 +109,25 @@ func (srv *BookService) GetBookDetail(ctx context.Context, req *pb.GetBookDetail
 			Description:   result.Description,
 		},
 	}, nil
+}
+
+func getRandomBooks(itemsPerRequest int, totalItems int) []int {
+
+	// Gera uma base apartir dos milesegundos atuais para poder gerar numeros aleatorios apartir dai
+	source := rand.NewSource(time.Now().UnixNano())
+	rnd := rand.New(source)
+
+	selectedItems := make(map[int]bool)
+
+	for len(selectedItems) < itemsPerRequest {
+		item := rnd.Intn(totalItems) + 1
+		selectedItems[item] = true
+	}
+
+	var randomIds []int
+	for item := range selectedItems {
+		randomIds = append(randomIds, item)
+	}
+
+	return randomIds
 }

@@ -1,23 +1,24 @@
 package repository
 
 import (
-	"time"
-
 	"gorm.io/gorm"
 	"net-grpc.com/internal/domain/entities"
 )
 
-type Repository struct {
+// BookRepository
+type BookRepository struct {
 	db *gorm.DB
 }
 
-func NewRepository(db *gorm.DB) Repository {
-	return Repository{
+// NewBookRepository
+func NewBookRepository(db *gorm.DB) *BookRepository {
+	return &BookRepository{
 		db: db,
 	}
 }
 
-func (r Repository) GetByID(bookID int) (*entities.BookDetail, error) {
+// GetBookDetailByID
+func (r *BookRepository) GetBookDetailByID(bookID int) (*entities.BookDetail, error) {
 	var books = entities.Books{ID: bookID}
 
 	tx := r.db.Find(&books)
@@ -50,21 +51,13 @@ func (r Repository) GetByID(bookID int) (*entities.BookDetail, error) {
 	}, nil
 }
 
-func (r Repository) GetAllRandom() ([]entities.Books, error) {
+// GetBooksByIDs
+func (r *BookRepository) GetBooksByIDs(randomIds []int) ([]entities.Books, error) {
 	var books = []entities.Books{}
 
-	dt := time.Now()
-
-	tx := r.db.Limit(10).Offset(dt.Minute()).Find(&books)
+	tx := r.db.Where(randomIds).Find(&books)
 	if tx.Error != nil {
 		return nil, tx.Error
 	}
 	return books, nil
 }
-
-// func() int {
-// 	dt := time.Now()
-// 	dt.Minute()
-// 	rand.Intn(30)
-// 	return 1
-// }

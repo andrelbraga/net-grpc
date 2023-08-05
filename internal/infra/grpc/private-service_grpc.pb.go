@@ -11,7 +11,6 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
-	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -28,7 +27,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type PrivateBookServiceClient interface {
-	GetRandomBook(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (PrivateBookService_GetRandomBookClient, error)
+	GetRandomBook(ctx context.Context, in *GetBookRandomRequest, opts ...grpc.CallOption) (PrivateBookService_GetRandomBookClient, error)
 	GetBookDetail(ctx context.Context, in *GetBookDetailsRequest, opts ...grpc.CallOption) (*GetBookDetailsResponse, error)
 }
 
@@ -40,7 +39,7 @@ func NewPrivateBookServiceClient(cc grpc.ClientConnInterface) PrivateBookService
 	return &privateBookServiceClient{cc}
 }
 
-func (c *privateBookServiceClient) GetRandomBook(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (PrivateBookService_GetRandomBookClient, error) {
+func (c *privateBookServiceClient) GetRandomBook(ctx context.Context, in *GetBookRandomRequest, opts ...grpc.CallOption) (PrivateBookService_GetRandomBookClient, error) {
 	stream, err := c.cc.NewStream(ctx, &PrivateBookService_ServiceDesc.Streams[0], PrivateBookService_GetRandomBook_FullMethodName, opts...)
 	if err != nil {
 		return nil, err
@@ -85,7 +84,7 @@ func (c *privateBookServiceClient) GetBookDetail(ctx context.Context, in *GetBoo
 // All implementations must embed UnimplementedPrivateBookServiceServer
 // for forward compatibility
 type PrivateBookServiceServer interface {
-	GetRandomBook(*emptypb.Empty, PrivateBookService_GetRandomBookServer) error
+	GetRandomBook(*GetBookRandomRequest, PrivateBookService_GetRandomBookServer) error
 	GetBookDetail(context.Context, *GetBookDetailsRequest) (*GetBookDetailsResponse, error)
 	mustEmbedUnimplementedPrivateBookServiceServer()
 }
@@ -94,7 +93,7 @@ type PrivateBookServiceServer interface {
 type UnimplementedPrivateBookServiceServer struct {
 }
 
-func (UnimplementedPrivateBookServiceServer) GetRandomBook(*emptypb.Empty, PrivateBookService_GetRandomBookServer) error {
+func (UnimplementedPrivateBookServiceServer) GetRandomBook(*GetBookRandomRequest, PrivateBookService_GetRandomBookServer) error {
 	return status.Errorf(codes.Unimplemented, "method GetRandomBook not implemented")
 }
 func (UnimplementedPrivateBookServiceServer) GetBookDetail(context.Context, *GetBookDetailsRequest) (*GetBookDetailsResponse, error) {
@@ -114,7 +113,7 @@ func RegisterPrivateBookServiceServer(s grpc.ServiceRegistrar, srv PrivateBookSe
 }
 
 func _PrivateBookService_GetRandomBook_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(emptypb.Empty)
+	m := new(GetBookRandomRequest)
 	if err := stream.RecvMsg(m); err != nil {
 		return err
 	}
