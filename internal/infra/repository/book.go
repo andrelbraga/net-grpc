@@ -5,13 +5,19 @@ import (
 	"net-grpc.com/internal/domain/entities"
 )
 
+// DBInterface
+type DBInterface interface {
+	Find(dest interface{}, conds ...interface{}) *gorm.DB
+	Where(query interface{}, args ...interface{}) *gorm.DB
+}
+
 // BookRepository
 type BookRepository struct {
-	db *gorm.DB
+	db DBInterface
 }
 
 // NewBookRepository
-func NewBookRepository(db *gorm.DB) *BookRepository {
+func NewBookRepository(db DBInterface) *BookRepository {
 	return &BookRepository{
 		db: db,
 	}
