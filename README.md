@@ -1,2 +1,7 @@
-# net-grpc
-GRPC - Book
+# Application streaming books
+
+Protocol gRPC with query database Postgres.
+
+GetRandom
+
+GetBookDetail
