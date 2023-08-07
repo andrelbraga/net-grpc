@@ -43,6 +43,22 @@ services:
     networks:
       - network-grpc
 
+  net-api:
+    environment:
+      GO_ENV: development
+    build:
+      context: ../net-api/.
+      dockerfile: ../net-api/Dockerfile
+    ports:
+      - 9191:9191
+    volumes:
+      - .:/usr/src/app
+    restart: unless-stopped
+    depends_on:
+      - net-grpc
+    networks:
+      - network-grpc
+
 networks:
   network-grpc:
     driver: bridge
